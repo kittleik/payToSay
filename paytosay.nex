@@ -1,0 +1,25 @@
+pragma nexscript ^1.0.0;
+
+// If You have a something to say, you have to pay!
+contract PayToSay(int paymentRequirement, pubkey owner) {
+
+    function say(bytes alias, bytes message) {
+
+        // This contract must live on
+        int i = this.activeInputIndex;
+        require(tx.outputs[i].lockingBytecode == tx.inputs[i].lockingBytecode);
+
+        // Verify the pay
+        require(tx.amountOut <= tx.amountIn - paymentRequirement);
+
+        // Verify the say
+        require(alias.length >= 1);
+        require(message.length >= 1);
+    }
+
+    // Only the owner can withdraw
+    function payday(sig ownerSig) {
+        require(checkSig(ownerSig, owner));
+    }
+}
+
